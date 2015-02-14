@@ -1,0 +1,130 @@
+<html>
+
+<script>
+
+// Given an input array of numbers that correspond to phone keypad presses,
+// generate a list of all possible words that could be created using those
+// numbers. For example, the number 2 could be the letters 'a', 'b', or 'c'.
+
+// You may assume you have access to an api that accepts a string and returns true
+// or false indicating whether or not that string is a word.
+function isValidWord(wrd)
+{
+	// api call
+	// tbd
+	return true;
+}
+
+var keyMap = 
+	{
+	0: [' ',' ',' '],	// not used, want to count from zero
+	1: [' ',' ',' '],	// not used
+    2: ['a', 'b', 'c'],
+    3: ['d', 'e', 'f'],
+    4: ['g', 'h', 'i'],
+    5: ['j', 'k', 'l'],
+    6: ['m', 'n', 'o'],
+    7: ['p', 'q', 'r', 's'],
+    8: ['t', 'u', 'v'],
+    9: ['w', 'x', 'y', 'z'],
+	};
+
+// number object:
+// we can traverse every char combo with consequtive calls to number objects
+function numberObj (number)
+{
+	var i;
+	
+	this.number = number;
+
+	this.n = 0;
+	this.nCalls = 1;
+	this.index= 0;
+	this.charCount = (number == 7 || number == 9)? 4 : 3;
+	this.ch = [];
+	for (i = 0; i < this.charCount; i++)
+		this.ch[i] = keyMap[number][i];
+
+	this.getCharCount = function ()
+		{
+		return (this.charCount);
+		};
+	this.setnCalls = function (nCalls)
+		{
+		this.nCalls = nCalls;
+		};
+    this.getChar = function ()
+		{
+		var chout = this.ch[this.index];
+		
+		// every nCalls, increment index into ch[]
+		this.n += 1;
+		if (this.n >= this.nCalls)
+			{
+			this.n = 0;
+			this.index += 1;
+			if (this.index >= this.charCount) this.index = 0;
+			}
+		
+		return chout;
+		};
+};
+
+// main function converts a input array of numbers to all possible words	
+function getWords (numberList)
+{
+	var numObj = []; // max 8 number objects
+	var wrd;
+	var i, j, numberOfCombos;
+
+	// if number list too long, exit
+	if (numberList.length > 8)
+		{
+		console.log ("Too many numbers!");
+		return;
+		}
+
+	// create an array of number objects, one object for each number in 
+	// the input number list
+	//     number objects are smart, they return chars based on number value, 
+	// 	   position in number list, and how many times their getChar() is called
+	// 	   so we can traverse every char combo with consequtive calls
+	for (i = 0; i < numberList.length; i++)
+		numObj[i] = new numberObj (numberList[i]);
+
+	// figure how many possible char combos their are in this
+	// number list and configure the number objects to know
+	// when to shift char
+	for (i = numberList.length-1, numberOfCombos = 1; i >= 0; i--)
+		{
+		numObj[i].setnCalls(numberOfCombos);
+		numberOfCombos *= numObj[i].getCharCount() ;
+		}
+	
+	var wordlist = [""]; // start with empty wordlist
+	
+	// traverse every char combo with consequtive calls of the smart
+	// number objects
+	for (i = 0; i < numberOfCombos; i++)
+		{
+		// build char combo (wrd)
+		for (j = 0, wrd = ""; j < numberList.length; j++)
+			wrd += numObj[j].getChar() ;
+		
+		// use api call to check if char combo is a valid word and
+		// if valid, add to output word list
+		if (isValidWord(wrd))
+			{
+			wordlist[wordlist.length] = wrd;
+			console.log(wrd);
+			}
+		}
+}
+
+var numberlist = [2,3,4];
+
+getWords (numberlist);
+
+</script>
+
+</html>
